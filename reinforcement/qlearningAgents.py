@@ -195,16 +195,38 @@ class ApproximateQAgent(PacmanQAgent):
         """
           Should return Q(state,action) = w * featureVector
           where * is the dotProduct operator
+
+          Chat so like i should get 0.0 if i have never seen it before right
+          and feature vector is like a dictionary
+          therefore the q value is the sum of the weights * features
         """
         "*** YOUR CODE HERE ***"
+        featureVector = self.featExtractor.getFeatures(state, action)
+        qValue = 0.0
+
+        for feature, value in featureVector.items():
+            qValue += self.weights[feature] * value
+
+        return qValue
         util.raiseNotDefined()
 
     def update(self, state, action, nextState, reward: float):
+
         """
            Should update your weights based on transition
+
+           chat so im gonna start by trying to implement the website stuff
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        """
+        now we gotta update weights
+        """
+        maxNextQval = max(self.getQValue(nextState, nextAction) for nextAction in self.getLegalActions(
+            nextState)) if self.getLegalActions(nextState) else 0.0 #copy and pasted from prev
+        difference = (reward + self.discount * maxNextQval) - self.getQValue(state, action)
+        featureVector = self.featExtractor.getFeatures(state, action)
+        for feature in featureVector:
+            self.weights[feature] += self.alpha * difference * featureVector[feature]
 
     def final(self, state):
         """Called at the end of each game."""
